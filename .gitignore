@@ -1,0 +1,39 @@
+# Node modules
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# API Keys and secrets (NEVER commit these!)
+.env
+.env.local
+.env.*.local
+api_keys.js
+secrets.json
+
+# Logs
+logs/
+*.log
+
+# Build files
+dist/
+build/
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+
+# Cache
+.cache/
+.eslintcache
