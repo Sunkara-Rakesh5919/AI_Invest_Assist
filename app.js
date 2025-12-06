@@ -862,8 +862,8 @@ class AIStockAdvisor {
     // Update internal stock data with real API data
     updateStocksWithRealData() {
         const updateStock = (stock, realData) => {
-            if (realData) {
-                stock.current = realData.current || stock.current;
+            if (realData && realData.current) {
+                stock.current = realData.current;
                 stock.change = realData.change || 0;
                 stock.changePercent = realData.changePercent || 0;
                 stock.volume = realData.volume;
@@ -871,6 +871,19 @@ class AIStockAdvisor {
                 stock.low = realData.low;
                 stock.source = realData.source;
                 stock.lastUpdated = realData.timestamp;
+                
+                // Calculate realistic target price based on risk level
+                const riskMultiplier = {
+                    'low': 1.10,      // 10% upside for low risk
+                    'medium': 1.18,   // 18% upside for medium risk
+                    'high': 1.28      // 28% upside for high risk
+                };
+                
+                const multiplier = riskMultiplier[stock.risk] || 1.15;
+                stock.target = parseFloat((stock.current * multiplier).toFixed(2));
+            } else if (!stock.current) {
+                // Fallback to conservative estimates if real data unavailable
+                stock.target = stock.target || (stock.current * 1.15);
             }
         };
 
@@ -942,66 +955,72 @@ class AIStockAdvisor {
                 { 
                     symbol: 'TCS',
                     name: 'Tata Consultancy Services',
-                    current: 3850,
-                    target: 4350,
+                    current: null,
+                    target: null,
                     risk: 'low',
                     aiScore: 92,
-                    reason: 'Strong fundamentals, consistent growth, IT sector strength'
+                    reason: 'Strong fundamentals, consistent growth, IT sector strength',
+                    source: null,
+                    fetching: true
                 },
                 {
                     symbol: 'INFY',
                     name: 'Infosys Limited',
-                    current: 1920,
-                    target: 2180,
+                    current: null,
+                    target: null,
                     risk: 'low',
                     aiScore: 89,
-                    reason: 'Stable revenue, digital transformation leader, good dividend'
+                    reason: 'Stable revenue, digital transformation leader, good dividend',
+                    source: null,
+                    fetching: true
                 },
                 {
                     symbol: 'RELIANCE',
                     name: 'Reliance Industries',
-                    current: 1380,
-                    target: 1650,
+                    current: null,
+                    target: null,
                     risk: 'medium',
                     aiScore: 85,
-                    reason: 'Diversified portfolio, strong capex, energy & telecom mix'
+                    reason: 'Diversified portfolio, strong capex, energy & telecom mix',
+                    source: null,
+                    fetching: true
                 }
             ],
             penny: [
-                { symbol: 'SUZLON', name: 'Suzlon Energy', current: 32, target: 48, risk: 'high', aiScore: 72, reason: 'Renewable energy boom, turnaround story' },
-                { symbol: 'VEDL', name: 'Vedanta', current: 380, target: 520, risk: 'high', aiScore: 70, reason: 'Commodity prices rising, operational efficiency' },
-                { symbol: 'YESBANK', name: 'Yes Bank', current: 18, target: 28, risk: 'high', aiScore: 68, reason: 'Recovery play, improved NPA metrics' },
-                { symbol: 'ADANIPORTS', name: 'Adani Ports', current: 450, target: 580, risk: 'medium', aiScore: 75, reason: 'Port infrastructure growth, global trade recovery' },
-                { symbol: 'NATIONALSTL', name: 'National Steel', current: 65, target: 85, risk: 'high', aiScore: 70, reason: 'Steel prices elevated, capacity expansion' },
-                { symbol: 'BHEL', name: 'BHEL', current: 45, target: 62, risk: 'medium', aiScore: 72, reason: 'Government contracts, infrastructure push' },
-                { symbol: 'SAIL', name: 'SAIL', current: 55, target: 75, risk: 'medium', aiScore: 71, reason: 'Mining sector recovery, steel demand high' },
-                { symbol: 'JSWSTEEL', name: 'JSW Steel', current: 520, target: 680, risk: 'medium', aiScore: 74, reason: 'Strong balance sheet, capacity additions' },
-                { symbol: 'TATASTEEL', name: 'Tata Steel', current: 1150, target: 1450, risk: 'medium', aiScore: 76, reason: 'Global demand recovery, premium positioning' },
-                { symbol: 'NMDC', name: 'NMDC', current: 95, target: 135, risk: 'medium', aiScore: 73, reason: 'Iron ore exports strong, dividend stock' }
+                { symbol: 'SUZLON', name: 'Suzlon Energy', current: null, target: null, risk: 'high', aiScore: 72, reason: 'Renewable energy boom, turnaround story', source: null, fetching: true },
+                { symbol: 'VEDL', name: 'Vedanta', current: null, target: null, risk: 'high', aiScore: 70, reason: 'Commodity prices rising, operational efficiency', source: null, fetching: true },
+                { symbol: 'YESBANK', name: 'Yes Bank', current: null, target: null, risk: 'high', aiScore: 68, reason: 'Recovery play, improved NPA metrics', source: null, fetching: true },
+                { symbol: 'ADANIPORTS', name: 'Adani Ports', current: null, target: null, risk: 'medium', aiScore: 75, reason: 'Port infrastructure growth, global trade recovery', source: null, fetching: true },
+                { symbol: 'NATIONALSTL', name: 'National Steel', current: null, target: null, risk: 'high', aiScore: 70, reason: 'Steel prices elevated, capacity expansion', source: null, fetching: true },
+                { symbol: 'BHEL', name: 'BHEL', current: null, target: null, risk: 'medium', aiScore: 72, reason: 'Government contracts, infrastructure push', source: null, fetching: true },
+                { symbol: 'SAIL', name: 'SAIL', current: null, target: null, risk: 'medium', aiScore: 71, reason: 'Mining sector recovery, steel demand high', source: null, fetching: true },
+                { symbol: 'JSWSTEEL', name: 'JSW Steel', current: null, target: null, risk: 'medium', aiScore: 74, reason: 'Strong balance sheet, capacity additions', source: null, fetching: true },
+                { symbol: 'TATASTEEL', name: 'Tata Steel', current: null, target: null, risk: 'medium', aiScore: 76, reason: 'Global demand recovery, premium positioning', source: null, fetching: true },
+                { symbol: 'NMDC', name: 'NMDC', current: null, target: null, risk: 'medium', aiScore: 73, reason: 'Iron ore exports strong, dividend stock', source: null, fetching: true }
             ],
             under100: [
-                { symbol: 'YESBANK', name: 'Yes Bank', current: 18, target: 28, risk: 'high', aiScore: 68, reason: 'Recovery story with new management' },
-                { symbol: 'BANKBARODA', name: 'Bank of Baroda', current: 65, target: 85, risk: 'medium', aiScore: 78, reason: 'Merger synergies, asset quality improving' },
-                { symbol: 'IDBI', name: 'IDBI Bank', current: 75, target: 95, reason: 'Privatization potential, restructuring benefits', risk: 'medium', aiScore: 75 },
-                { symbol: 'NATIONALSTL', name: 'National Steel', current: 65, target: 85, risk: 'high', aiScore: 70, reason: 'Steel prices elevated' },
-                { symbol: 'SAIL', name: 'SAIL', current: 55, target: 75, risk: 'medium', aiScore: 71, reason: 'Mining sector recovery' },
-                { symbol: 'BHEL', name: 'BHEL', current: 45, target: 62, risk: 'medium', aiScore: 72, reason: 'Government infrastructure projects' },
-                { symbol: 'NMDC', name: 'NMDC', current: 95, target: 135, risk: 'medium', aiScore: 73, reason: 'Iron ore export boom' },
-                { symbol: 'COALINDIA', name: 'Coal India', current: 285, target: 380, risk: 'medium', aiScore: 74, reason: 'Energy demand surge, dividend yield high' },
-                { symbol: 'SBIN', name: 'SBI', current: 485, target: 580, risk: 'low', aiScore: 82, reason: 'Largest bank, strong NPA recovery' },
-                { symbol: 'ICICIBANK', name: 'ICICI Bank', current: 795, target: 950, risk: 'low', aiScore: 85, reason: 'Digital leader, strong deposit base' }
+                { symbol: 'YESBANK', name: 'Yes Bank', current: null, target: null, risk: 'high', aiScore: 68, reason: 'Recovery story with new management', source: null, fetching: true },
+                { symbol: 'BANKBARODA', name: 'Bank of Baroda', current: null, target: null, risk: 'medium', aiScore: 78, reason: 'Merger synergies, asset quality improving', source: null, fetching: true },
+                { symbol: 'IDBI', name: 'IDBI Bank', current: null, target: null, reason: 'Privatization potential, restructuring benefits', risk: 'medium', aiScore: 75, source: null, fetching: true },
+                { symbol: 'NATIONALSTL', name: 'National Steel', current: null, target: null, risk: 'high', aiScore: 70, reason: 'Steel prices elevated', source: null, fetching: true },
+                { symbol: 'SAIL', name: 'SAIL', current: null, target: null, risk: 'medium', aiScore: 71, reason: 'Mining sector recovery', source: null, fetching: true },
+                { symbol: 'BHEL', name: 'BHEL', current: null, target: null, risk: 'medium', aiScore: 72, reason: 'Government infrastructure projects', source: null, fetching: true },
+                { symbol: 'NMDC', name: 'NMDC', current: null, target: null, risk: 'medium', aiScore: 73, reason: 'Iron ore export boom', source: null, fetching: true },
+                { symbol: 'COALINDIA', name: 'Coal India', current: null, target: null, risk: 'medium', aiScore: 74, reason: 'Energy demand surge, dividend yield high', source: null, fetching: true },
+                { symbol: 'SBIN', name: 'SBI', current: null, target: null, risk: 'low', aiScore: 82, reason: 'Largest bank, strong NPA recovery', source: null, fetching: true },
+                { symbol: 'ICICIBANK', name: 'ICICI Bank', current: null, target: null, risk: 'low', aiScore: 85, reason: 'Digital leader, strong deposit base', source: null, fetching: true }
             ],
             under10: [
-                { symbol: 'DCAL', name: 'DCM Allan', current: 8.50, target: 15, risk: 'high', aiScore: 68, reason: 'Multi-cap diversification, turnaround' },
-                { symbol: 'ASTRAMICRO', name: 'Astra Micro', current: 9.20, target: 16, risk: 'high', aiScore: 70, reason: 'Electronics manufacturing, govt support' },
-                { symbol: 'AMBUJACEM', name: 'Ambuja Cements', current: 465, target: 600, risk: 'low', aiScore: 82, reason: 'Cement demand recovery' },
-                { symbol: 'ANDHRAPET', name: 'Andhra Petro', current: 6.50, target: 12, risk: 'high', aiScore: 66, reason: 'Energy transition play' },
-                { symbol: 'GUJALPHYDRO', name: 'Gujarat Hydro', current: 7.80, target: 14, risk: 'high', aiScore: 65, reason: 'Renewable energy project' },
-                { symbol: 'MOIL', name: 'MOIL', current: 168, target: 240, risk: 'medium', aiScore: 72, reason: 'Manganese ore exports' },
-                { symbol: 'TATACOFFEE', name: 'Tata Coffee', current: 185, target: 260, risk: 'medium', aiScore: 71, reason: 'Global coffee prices recovery' },
-                { symbol: 'KRBL', name: 'KRBL Limited', current: 365, target: 480, risk: 'medium', aiScore: 73, reason: 'Rice exports to new markets' },
-                { symbol: 'BAJAJTINSF', name: 'Bajaj Hindustan', current: 8.90, target: 16, risk: 'high', aiScore: 67, reason: 'Sugar prices elevated' },
-                { symbol: 'JKTYRE', name: 'JK Tyre', current: 145, target: 210, risk: 'medium', aiScore: 70, reason: 'Auto sector recovery' }
+                { symbol: 'DCAL', name: 'DCM Allan', current: null, target: null, risk: 'high', aiScore: 68, reason: 'Multi-cap diversification, turnaround', source: null, fetching: true },
+                { symbol: 'ASTRAMICRO', name: 'Astra Micro', current: null, target: null, risk: 'high', aiScore: 70, reason: 'Electronics manufacturing, govt support', source: null, fetching: true },
+                { symbol: 'AMBUJACEM', name: 'Ambuja Cements', current: null, target: null, risk: 'low', aiScore: 82, reason: 'Cement demand recovery', source: null, fetching: true },
+                { symbol: 'ANDHRAPET', name: 'Andhra Petro', current: null, target: null, risk: 'high', aiScore: 66, reason: 'Energy transition play', source: null, fetching: true },
+                { symbol: 'GUJALPHYDRO', name: 'Gujarat Hydro', current: null, target: null, risk: 'high', aiScore: 65, reason: 'Renewable energy project', source: null, fetching: true },
+                { symbol: 'MOIL', name: 'MOIL', current: null, target: null, risk: 'medium', aiScore: 72, reason: 'Manganese ore exports', source: null, fetching: true },
+                { symbol: 'TATACOFFEE', name: 'Tata Coffee', current: null, target: null, risk: 'medium', aiScore: 71, reason: 'Global coffee prices recovery', source: null, fetching: true },
+                { symbol: 'KRBL', name: 'KRBL Limited', current: null, target: null, risk: 'medium', aiScore: 73, reason: 'Rice exports to new markets', source: null, fetching: true },
+                { symbol: 'BAJAJTINSF', name: 'Bajaj Hindustan', current: null, target: null, risk: 'high', aiScore: 67, reason: 'Sugar prices elevated', source: null, fetching: true },
+                { symbol: 'JKTYRE', name: 'JK Tyre', current: null, target: null, risk: 'medium', aiScore: 70, reason: 'Auto sector recovery', source: null, fetching: true }
             ],
             aiTop10: [],
             avoid: [
