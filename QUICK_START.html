@@ -4,163 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quick Start Guide</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
-            color: #e0e0e0;
-            padding: 40px;
-            line-height: 1.6;
-        }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        h1 {
-            color: #10b981;
-            text-align: center;
-            margin-bottom: 40px;
-            font-size: 2.5em;
-        }
-        .section {
-            background: rgba(15, 52, 96, 0.3);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 25px;
-        }
-        .section h2 {
-            color: #10b981;
-            border-bottom: 2px solid rgba(16, 185, 129, 0.3);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-        .feature-list {
-            list-style: none;
-            padding: 0;
-        }
-        .feature-list li {
-            padding: 10px 0;
-            padding-left: 25px;
-            position: relative;
-        }
-        .feature-list li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #10b981;
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-        .page-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin: 15px 0;
-        }
-        .page-item {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(15, 52, 96, 0.3) 100%);
-            border-left: 4px solid #10b981;
-            padding: 15px;
-            border-radius: 5px;
-        }
-        .page-item strong {
-            color: #10b981;
-        }
-        .page-item p {
-            color: #cbd5e1;
-            font-size: 0.9em;
-            margin: 5px 0 0 0;
-        }
-        .button {
-            display: inline-block;
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            padding: 12px 30px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: 600;
-            margin: 20px 0;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1em;
-        }
-        .button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-        }
-        .ai-info {
-            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(15, 52, 96, 0.3) 100%);
-            border-left: 4px solid #a855f7;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 15px 0;
-        }
-        .ai-info strong {
-            color: #a855f7;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin: 15px 0;
-        }
-        .stat-box {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            padding: 15px;
-            border-radius: 5px;
-            text-align: center;
-        }
-        .stat-value {
-            font-size: 1.8em;
-            color: #10b981;
-            font-weight: bold;
-        }
-        .stat-label {
-            color: #a0aec0;
-            font-size: 0.85em;
-            margin-top: 5px;
-        }
-        .code {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            padding: 10px;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
-            color: #10b981;
-            margin: 10px 0;
-        }
-        .warning {
-            background: rgba(239, 68, 68, 0.1);
-            border-left: 4px solid #ef4444;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 15px 0;
-            color: #fca5a5;
-        }
-        .warning strong {
-            color: #ef4444;
-        }
-        footer {
-            text-align: center;
-            margin-top: 50px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(16, 185, 129, 0.2);
-            color: #a0aec0;
-            font-size: 0.9em;
-        }
-    </style>
+    <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
     <div class="container">
         <h1>📈 AI Stock Market Advisor</h1>
-        <h2 style="text-align: center; color: #a0aec0; margin-bottom: 40px;">Quick Start Guide</h2>
+        <h2 class="subheading text-center mb-8">Quick Start Guide</h2>
 
         <div class="section">
-            <h2>🚀 Getting Started</h2>
-            <ol style="color: #cbd5e1; padding-left: 20px;">
+            <h2 class="section-heading">🚀 Getting Started</h2>
+            <ol class="muted-small list-indent">
                 <li>Open <span class="code">index.html</span> in your web browser</li>
                 <li>You'll see the Home page with Top 3 stock recommendations</li>
                 <li>Navigate through different pages using the menu buttons at the top</li>
@@ -169,21 +22,21 @@
         </div>
 
         <div class="section">
-            <h2>🌟 Performance Metrics</h2>
+            <h2 class="section-heading">🌟 Performance Metrics</h2>
             <div class="stats-grid">
-                <div class="stat-box">
+                <div class="stats-box">
                     <div class="stat-value">85%</div>
                     <div class="stat-label">AI Accuracy (30-day)</div>
                 </div>
-                <div class="stat-box">
+                <div class="stats-box">
                     <div class="stat-value">8/10</div>
                     <div class="stat-label">Today's Profitable</div>
                 </div>
-                <div class="stat-box">
+                <div class="stats-box">
                     <div class="stat-value">92%</div>
                     <div class="stat-label">Avg Confidence</div>
                 </div>
-                <div class="stat-box">
+                <div class="stats-box">
                     <div class="stat-value">₹2.3L</div>
                     <div class="stat-label">Total Gains</div>
                 </div>
@@ -191,7 +44,7 @@
         </div>
 
         <div class="section">
-            <h2>📱 All Pages Available</h2>
+            <h2 class="section-heading">📱 All Pages Available</h2>
             <div class="page-list">
                 <div class="page-item">
                     <strong>🏠 Home</strong>
@@ -245,10 +98,10 @@
         </div>
 
         <div class="section">
-            <h2>🤖 AI Algorithms Used</h2>
-            <div class="ai-info">
-                <strong>Ensemble ML System:</strong>
-                <ul style="color: #cbd5e1; margin: 10px 0; padding-left: 20px;">
+            <h2 class="section-heading">🤖 AI Algorithms Used</h2>
+            <div class="ai-suggestion">
+                <strong class="ai-label">Ensemble ML System:</strong>
+                <ul class="muted-small list-indent">
                     <li>Technical Analysis (80% weight) - RSI, MACD, Bollinger Bands</li>
                     <li>Fundamental Analysis (60% weight) - P/E, P/B, ROE ratios</li>
                     <li>Sentiment Analysis (50% weight) - News, social media, analyst ratings</li>
@@ -272,7 +125,7 @@
         <div class="section">
             <h2>⚡ Trading Strategies</h2>
             
-            <h3 style="color: #fbbf24; margin-top: 15px;">📍 Day Trading Strategy</h3>
+            <h3 class="highlight-yellow mt-8">📍 Day Trading Strategy</h3>
             <ul class="feature-list">
                 <li>High volatility stocks for quick 2-5% gains</li>
                 <li>Optimal entry times calculated by AI (9AM-3:30PM)</li>
@@ -281,7 +134,7 @@
                 <li>Best for experienced traders</li>
             </ul>
 
-            <h3 style="color: #22c55e; margin-top: 15px;">🎯 Long-Term Strategy</h3>
+            <h3 class="highlight-green mt-8">🎯 Long-Term Strategy</h3>
             <ul class="feature-list">
                 <li>Blue-chip and quality mid-cap companies</li>
                 <li>Dividend yield and 12-month targets</li>
@@ -290,7 +143,7 @@
                 <li>Lower risk, steady growth profile</li>
             </ul>
 
-            <h3 style="color: #06b6d4; margin-top: 15px;">🔮 Tomorrow's Plan</h3>
+            <h3 class="widget-heading mt-8">🔮 Tomorrow's Plan</h3>
             <ul class="feature-list">
                 <li>Next-day predictions with confidence scores</li>
                 <li>Specific entry and exit times recommended</li>
@@ -342,7 +195,7 @@
         <div class="warning">
             <strong>⚠️ Important Disclaimer:</strong>
             <p>This application is for educational purposes only. Stock market investments carry risk. Always:</p>
-            <ul style="margin-left: 20px; margin-top: 10px;">
+            <ul class="muted-small list-indent mt-8">
                 <li>Do your own research</li>
                 <li>Consult financial advisors</li>
                 <li>Understand market risks</li>
@@ -363,8 +216,8 @@
             </ul>
         </div>
 
-        <div style="text-align: center; margin: 40px 0;">
-            <a href="index.html" class="button">Open AI Stock Advisor →</a>
+        <div class="text-center mb-8">
+            <a href="index.html" class="btn">Open AI Stock Advisor →</a>
         </div>
 
         <footer>

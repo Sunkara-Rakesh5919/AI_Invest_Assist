@@ -4,542 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Stock Market Advisor - Indian Market</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
-            color: #e0e0e0;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* Header */
-        header {
-            background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        header h1 {
-            color: #10b981;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
-        }
-
-        .header-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .market-time {
-            font-size: 0.95em;
-            color: #a0aec0;
-        }
-
-        .refresh-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9em;
-            color: #10b981;
-        }
-
-        .refresh-indicator {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: #10b981;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* Navigation */
-        nav {
-            background: rgba(15, 52, 96, 0.9);
-            padding: 0;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            overflow-x: auto;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 0;
-            padding: 10px;
-            flex-wrap: wrap;
-        }
-
-        nav li {
-            flex: 1;
-            min-width: 120px;
-        }
-
-        nav button {
-            width: 100%;
-            padding: 12px 15px;
-            background: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            cursor: pointer;
-            font-size: 0.95em;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border-radius: 5px;
-        }
-
-        nav button:hover {
-            background: rgba(16, 185, 129, 0.2);
-            border-color: #10b981;
-            transform: translateY(-2px);
-        }
-
-        nav button.active {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: #0f0f1e;
-            border-color: #10b981;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-        }
-
-        /* Page Content */
-        .page {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Stock Cards */
-        .stocks-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stock-card {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(15, 52, 96, 0.3) 100%);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 10px;
-            padding: 20px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .stock-card:hover {
-            transform: translateY(-5px);
-            border-color: #10b981;
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);
-        }
-
-        .stock-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 15px;
-        }
-
-        .stock-symbol {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #10b981;
-        }
-
-        .stock-confidence {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-        }
-
-        .stock-price {
-            font-size: 1.2em;
-            color: #e0e0e0;
-            margin: 10px 0;
-        }
-
-        .stock-price span {
-            color: #a0aec0;
-            font-size: 0.9em;
-        }
-
-        .stock-change {
-            font-size: 0.95em;
-            margin: 8px 0;
-            font-weight: 600;
-        }
-
-        .stock-change.positive {
-            color: #10b981;
-        }
-
-        .stock-change.negative {
-            color: #ef4444;
-        }
-
-        .stock-target {
-            color: #60a5fa;
-            font-size: 0.9em;
-            margin: 8px 0;
-        }
-
-        .stock-reason {
-            color: #cbd5e1;
-            font-size: 0.9em;
-            line-height: 1.5;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .confidence-bar {
-            background: rgba(16, 185, 129, 0.2);
-            height: 4px;
-            border-radius: 2px;
-            margin-top: 10px;
-            overflow: hidden;
-        }
-
-        .confidence-fill {
-            background: linear-gradient(90deg, #10b981, #059669);
-            height: 100%;
-            border-radius: 2px;
-            transition: width 0.5s ease;
-        }
-
-        /* Risk Badge */
-        .risk-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 600;
-            margin-right: 8px;
-            margin-bottom: 8px;
-        }
-
-        .risk-low {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
-        }
-
-        .risk-medium {
-            background: rgba(248, 113, 113, 0.2);
-            color: #fbbf24;
-        }
-
-        .risk-high {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-        }
-
-        /* Section Heading */
-        .section-heading {
-            font-size: 1.8em;
-            color: #10b981;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-heading::before {
-            content: '';
-            width: 4px;
-            height: 30px;
-            background: linear-gradient(180deg, #10b981, transparent);
-            border-radius: 2px;
-        }
-
-        /* Stats Box */
-        .stats-box {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(15, 52, 96, 0.3) 100%);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #10b981;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            color: #a0aec0;
-            font-size: 0.95em;
-        }
-
-        /* Table */
-        .history-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-
-        .history-table thead {
-            background: rgba(16, 185, 129, 0.1);
-        }
-
-        .history-table th {
-            padding: 12px;
-            text-align: left;
-            color: #10b981;
-            font-weight: 600;
-            border-bottom: 2px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .history-table td {
-            padding: 12px;
-            border-bottom: 1px solid rgba(16, 185, 129, 0.1);
-            color: #cbd5e1;
-        }
-
-        .history-table tbody tr:hover {
-            background: rgba(16, 185, 129, 0.05);
-        }
-
-        /* Update Item */
-        .update-item {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(15, 52, 96, 0.3) 100%);
-            border-left: 4px solid #3b82f6;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
-        .update-time {
-            color: #3b82f6;
-            font-weight: 600;
-            font-size: 0.9em;
-            margin-bottom: 5px;
-        }
-
-        .update-content {
-            color: #e0e0e0;
-            line-height: 1.6;
-        }
-
-        /* AI Suggestion Box */
-        .ai-suggestion {
-            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(15, 52, 96, 0.3) 100%);
-            border: 1px solid rgba(168, 85, 247, 0.3);
-            border-left: 4px solid #a855f7;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-
-        .ai-label {
-            color: #a855f7;
-            font-weight: 600;
-            font-size: 0.9em;
-            margin-bottom: 8px;
-        }
-
-        .ai-content {
-            color: #cbd5e1;
-            line-height: 1.6;
-        }
-
-        /* Risk Analysis */
-        .risk-item {
-            background: rgba(239, 68, 68, 0.05);
-            border-left: 4px solid #ef4444;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
-        .risk-title {
-            color: #ef4444;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .risk-description {
-            color: #cbd5e1;
-            font-size: 0.95em;
-            line-height: 1.6;
-        }
-
-        /* Day Trading */
-        .day-trading-card {
-            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(15, 52, 96, 0.3) 100%);
-            border: 1px solid rgba(251, 191, 36, 0.3);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .day-trading-card h3 {
-            color: #fbbf24;
-            margin-bottom: 10px;
-        }
-
-        /* Long term */
-        .long-term-card {
-            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(15, 52, 96, 0.3) 100%);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .long-term-card h3 {
-            color: #22c55e;
-            margin-bottom: 10px;
-        }
-
-        /* Tomorrow Plan */
-        .tomorrow-plan-card {
-            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(15, 52, 96, 0.3) 100%);
-            border: 1px solid rgba(6, 182, 212, 0.3);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .tomorrow-plan-card h3 {
-            color: #06b6d4;
-            margin-bottom: 10px;
-        }
-
-        .entry-time {
-            color: #06b6d4;
-            font-weight: 600;
-            font-size: 0.9em;
-            margin: 8px 0;
-        }
-
-        .market-condition {
-            background: rgba(6, 182, 212, 0.1);
-            color: #06b6d4;
-            padding: 8px 12px;
-            border-radius: 5px;
-            font-size: 0.85em;
-            display: inline-block;
-            margin: 8px 0;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.8em;
-            }
-
-            .stocks-grid {
-                grid-template-columns: 1fr;
-            }
-
-            nav ul {
-                flex-direction: column;
-            }
-
-            nav li {
-                width: 100%;
-            }
-
-            .header-info {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .section-heading {
-                font-size: 1.4em;
-            }
-        }
-
-        /* Shimmer Loading Animation */
-        .loading {
-            animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
-            0% {
-                opacity: 0.7;
-            }
-            50% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0.7;
-            }
-        }
-
-        /* Last Updated */
-        .last-updated {
-            color: #60a5fa;
-            font-size: 0.85em;
-            margin-top: 15px;
-            text-align: right;
-        }
-
-        /* Chart Container */
-        .chart-container {
-            background: rgba(15, 52, 96, 0.3);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
-            height: 300px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #a0aec0;
-        }
+    <link rel="stylesheet" href="styles/styles.css">
+       
     </style>
 </head>
 <body>
@@ -547,7 +13,7 @@
         <!-- Header -->
         <header>
             <h1>📈 AI Stock Market Advisor</h1>
-            <p style="color: #a0aec0; margin: 5px 0;">Indian Market Intelligence & Real-time Recommendations</p>
+            <p class="subheading">Indian Market Intelligence & Real-time Recommendations</p>
             <div class="header-info">
                 <div class="market-time">
                     <span>📅 Date:</span> <span id="currentDate"></span>
@@ -561,25 +27,26 @@
         </header>
 
         <!-- Navigation -->
-        <nav>
+        <nav role="navigation" aria-label="Main navigation">
             <ul>
-                <li><button class="nav-btn active" data-page="home">🏠 Home</button></li>
-                <li><button class="nav-btn" data-page="penny-stocks">💰 Penny</button></li>
-                <li><button class="nav-btn" data-page="under-100">₹100</button></li>
-                <li><button class="nav-btn" data-page="under-10">₹10</button></li>
-                <li><button class="nav-btn" data-page="ai-recommendations">🤖 AI Top 10</button></li>
-                <li><button class="nav-btn" data-page="avoid">⚠️ Avoid</button></li>
-                <li><button class="nav-btn" data-page="risks">⚡ Risks</button></li>
-                <li><button class="nav-btn" data-page="history">📊 History</button></li>
-                <li><button class="nav-btn" data-page="updates">📰 Updates</button></li>
-                <li><button class="nav-btn" data-page="day-trading">⚡ Day Trade</button></li>
-                <li><button class="nav-btn" data-page="long-term">🎯 Long Term</button></li>
-                <li><button class="nav-btn" data-page="tomorrow-plan">🔮 Tomorrow</button></li>
+                <li><button class="btn nav-btn active" aria-current="page" data-page="home">🏠 Home</button></li>
+                <li><button class="btn nav-btn" data-page="penny-stocks">💰 Penny</button></li>
+                <li><button class="btn nav-btn" data-page="under-100">₹100</button></li>
+                <li><button class="btn nav-btn" data-page="under-10">₹10</button></li>
+                <li><button class="btn nav-btn" data-page="ai-recommendations">🤖 AI Top 10</button></li>
+                <li><button class="btn nav-btn" data-page="avoid">⚠️ Avoid</button></li>
+                <li><button class="btn nav-btn" data-page="risks">⚡ Risks</button></li>
+                <li><button class="btn nav-btn" data-page="history">📊 History</button></li>
+                <li><button class="btn nav-btn" data-page="updates">📰 Updates</button></li>
+                <li><button class="btn nav-btn" data-page="day-trading">⚡ Day Trade</button></li>
+                <li><button class="btn nav-btn" data-page="long-term">🎯 Long Term</button></li>
+                <li><button class="btn nav-btn" data-page="tomorrow-plan">🔮 Tomorrow</button></li>
             </ul>
         </nav>
 
         <!-- HOME PAGE -->
-        <div id="home" class="page active">
+        <main class="main-content">
+        <div id="home" class="page active" role="region" aria-labelledby="homeHeading">
             <h2 class="section-heading">🌟 Top 3 Stocks to Pick Today</h2>
             <div class="stats-box">
                 <div class="stats-grid">
@@ -715,15 +182,15 @@
                     </div>
                 </div>
             </div>
-            <table class="history-table">
+            <table class="history-table" aria-label="AI Prediction History">
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Predictions</th>
-                        <th>Successful</th>
-                        <th>Success Rate</th>
-                        <th>Total Gain</th>
-                        <th>Status</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Predictions</th>
+                        <th scope="col">Successful</th>
+                        <th scope="col">Success Rate</th>
+                        <th scope="col">Total Gain</th>
+                        <th scope="col">Status</th>
                     </tr>
                 </thead>
                 <tbody id="historyBody">
@@ -819,6 +286,7 @@
             <div id="tomorrowPlanList"></div>
             <div class="last-updated">Last Updated: <span id="tomorrowLastUpdated">Now</span></div>
         </div>
+        </main>
     </div>
 
     <script src="app.js"></script>

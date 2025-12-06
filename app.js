@@ -1423,198 +1423,191 @@ class AIStockAdvisor {
         ];
     }
 
+    // Render Risk Item
+    renderRiskItem(risk) {
+        const riskClass = risk.riskLevel.toLowerCase() === 'low' ? 'risk-low' : (risk.riskLevel.toLowerCase() === 'medium' ? 'risk-medium' : 'risk-high');
+        return `
+            <div class="risk-item">
+                <div class="risk-title">⚠️ ${risk.title}</div>
+                <div class="risk-description">${risk.description}</div>
+                <div class="mt-8">
+                    <span class="risk-badge ${riskClass}">${risk.riskLevel}</span>
+                </div>
+                <div class="muted-small mt-8"><strong>Mitigation:</strong> ${risk.mitigation}</div>
+            </div>
+        `;
+    }
+
     // Render Stock Card with real-time data indicator
     renderStockCard(stock, rank = null) {
         const gain = ((stock.target - stock.current) / stock.current * 100).toFixed(2);
         const riskClass = stock.risk === 'low' ? 'risk-low' : stock.risk === 'medium' ? 'risk-medium' : 'risk-high';
         const dataSource = stock.source ? `📡 ${stock.source}` : '🤖 AI Predicted';
         const lastUpdate = stock.lastUpdated ? new Date(stock.lastUpdated).toLocaleTimeString() : 'Now';
-        
+        // Create accessible ids for labeling
+        const symbolId = `stock-${(stock.symbol || 'unknown').replace(/[^a-zA-Z0-9_-]/g, '')}-symbol`;
+
         return `
-            <div class="stock-card">
+            <article class="stock-card" role="article" aria-labelledby="${symbolId}" tabindex="0">
                 <div class="stock-header">
                     <div>
-                        <div class="stock-symbol">${rank ? `#${rank} ` : ''}${stock.symbol}</div>
-                        <div style="color: #cbd5e1; font-size: 0.9em;">${stock.name}</div>
+                        <div id="${symbolId}" class="stock-symbol">${rank ? `#${rank} ` : ''}${stock.symbol}</div>
+                        <div class="muted-small">${stock.name}</div>
                     </div>
                     <div class="stock-confidence">AI: ${stock.aiScore || stock.ensembleScore || 85}%</div>
                 </div>
-                
+
                 <div class="stock-price">
-                    ₹${stock.current.toFixed(2)}
-                    <span> → Target: ₹${stock.target.toFixed(2)}</span>
+                    ₹${(stock.current || 0).toFixed(2)}
+                    <span class="muted-small"> → Target: ₹${(stock.target || 0).toFixed(2)}</span>
                 </div>
 
                 ${stock.change ? `
-                    <div class="stock-change ${stock.change >= 0 ? 'positive' : 'negative'}">
+                    <div class="stock-change ${stock.change >= 0 ? 'positive' : 'negative'}" aria-hidden="false">
                         ${stock.change >= 0 ? '📈' : '📉'} Change: ${stock.change >= 0 ? '+' : ''}${stock.change.toFixed(2)} (${stock.changePercent}%)
                     </div>
                 ` : ''}
-                
+
                 <div class="stock-change positive">
                     📊 Expected Gain: <strong>+${gain}%</strong>
                 </div>
-                
-                <div style="background: rgba(16, 185, 129, 0.1); padding: 12px; border-radius: 5px; margin: 10px 0;">
-                    <div style="color: #10b981; font-weight: 600; margin-bottom: 5px;">AI Confidence</div>
-                    <div class="confidence-bar">
-                        <div class="confidence-fill" style="width: ${stock.aiScore || stock.ensembleScore || 85}%"></div>
-                    </div>
+
+                <div class="info-box" aria-label="AI confidence">
+                        <div class="muted-small accent-strong">AI Confidence</div>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="--fill: ${stock.aiScore || stock.ensembleScore || 85}%" aria-hidden="true"></div>
+                        </div>
                 </div>
 
                 ${stock.volume ? `
-                    <div style="color: #60a5fa; font-size: 0.85em; margin: 8px 0;">
-                        📊 Volume: ${(stock.volume / 1000000).toFixed(2)}M
-                    </div>
+                    <div class="muted-small" aria-label="volume">📊 Volume: ${(stock.volume / 1000000).toFixed(2)}M</div>
                 ` : ''}
 
                 ${stock.high && stock.low ? `
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; font-size: 0.85em;">
-                        <div style="background: rgba(16, 185, 129, 0.1); padding: 8px; border-radius: 3px;">
-                            <div style="color: #a0aec0;">High: ₹${stock.high.toFixed(2)}</div>
-                        </div>
-                        <div style="background: rgba(16, 185, 129, 0.1); padding: 8px; border-radius: 3px;">
-                            <div style="color: #a0aec0;">Low: ₹${stock.low.toFixed(2)}</div>
-                        </div>
+                    <div class="grid-two" aria-hidden="false">
+                        <div class="compact-box"><div class="muted-small">High: ₹${stock.high.toFixed(2)}</div></div>
+                        <div class="compact-box"><div class="muted-small">Low: ₹${stock.low.toFixed(2)}</div></div>
                     </div>
                 ` : ''}
-                
-                <div style="margin-top: 10px;">
+
+                <div class="mt-8">
                     <span class="risk-badge ${riskClass}">${stock.risk.toUpperCase()} RISK</span>
                 </div>
 
-                <div style="background: rgba(96, 165, 250, 0.1); padding: 8px; border-radius: 3px; margin: 8px 0; font-size: 0.8em; color: #60a5fa;">
-                    ${dataSource} | Updated: ${lastUpdate}
-                </div>
-                
+                <div class="info-box" aria-label="data source and last update">${dataSource} | Updated: ${lastUpdate}</div>
+
                 <div class="stock-reason">
                     <strong>Reason:</strong> ${stock.reason || 'Strong technical and fundamental indicators with positive sentiment'}
                 </div>
-            </div>
+            </article>
         `;
     }
 
     // Render Day Trading Card
     renderDayTradingCard(stock, rank) {
+        const headingId = `day-${(stock.symbol||'unknown').replace(/[^a-zA-Z0-9_-]/g,'')}-heading`;
         return `
-            <div class="day-trading-card">
-                <h3>#${rank} ${stock.symbol}</h3>
-                <p style="color: #cbd5e1; margin-bottom: 10px;">${stock.name}</p>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0;">
-                    <div style="background: rgba(251, 191, 36, 0.1); padding: 10px; border-radius: 5px;">
-                        <div style="font-size: 0.8em; color: #a0aec0;">Current Price</div>
-                        <div style="color: #fbbf24; font-weight: 600;">₹${stock.current.toFixed(2)}</div>
+            <section class="day-trading-card" role="region" aria-labelledby="${headingId}" tabindex="0">
+                <h3 id="${headingId}">#${rank} ${stock.symbol}</h3>
+                <p class="muted-small" aria-hidden="false">${stock.name}</p>
+
+                <div class="grid-two" aria-hidden="false">
+                    <div class="highlight-yellow">
+                        <div class="muted-small">Current Price</div>
+                        <div class="value-strong">₹${(stock.current||0).toFixed(2)}</div>
                     </div>
-                    <div style="background: rgba(251, 191, 36, 0.1); padding: 10px; border-radius: 5px;">
-                        <div style="font-size: 0.8em; color: #a0aec0;">Day Target</div>
-                        <div style="color: #fbbf24; font-weight: 600;">₹${stock.dayTarget}</div>
-                    </div>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0;">
-                    <div>
-                        <div style="font-size: 0.8em; color: #a0aec0;">Support</div>
-                        <div style="color: #ef4444; font-weight: 600;">₹${stock.supportLevel}</div>
-                    </div>
-                    <div>
-                        <div style="font-size: 0.8em; color: #a0aec0;">Resistance</div>
-                        <div style="color: #10b981; font-weight: 600;">₹${stock.resistanceLevel}</div>
+                    <div class="highlight-yellow">
+                        <div class="muted-small">Day Target</div>
+                        <div class="value-strong">₹${stock.dayTarget || 'N/A'}</div>
                     </div>
                 </div>
-                
-                <div class="entry-time">⏰ Entry Time: ${stock.optimalEntry}</div>
-                <div style="color: #ef4444; font-size: 0.9em; margin: 5px 0;">🛑 Stop Loss: ₹${stock.stopLoss}</div>
-                <div style="color: #fbbf24; margin-top: 10px;">Volatility: ${stock.volatility}%</div>
-            </div>
+
+                <div class="grid-two" aria-hidden="false">
+                    <div>
+                        <div class="muted-small">Support</div>
+                        <div class="highlight-red value-strong">₹${stock.supportLevel || 'N/A'}</div>
+                    </div>
+                    <div>
+                        <div class="muted-small">Resistance</div>
+                        <div class="highlight-green value-strong">₹${stock.resistanceLevel || 'N/A'}</div>
+                    </div>
+                </div>
+
+                <div class="entry-time">⏰ Entry Time: ${stock.optimalEntry || 'Any'}</div>
+                <div class="muted-small">🛑 Stop Loss: ₹${stock.stopLoss || 'N/A'}</div>
+                <div class="muted-small">Volatility: ${stock.volatility || 0}%</div>
+            </section>
         `;
     }
 
     // Render Long Term Card
     renderLongTermCard(stock, rank) {
+        const headingId = `lt-${(stock.symbol||'unknown').replace(/[^a-zA-Z0-9_-]/g,'')}-heading`;
         return `
-            <div class="long-term-card">
-                <h3>#${rank} ${stock.symbol}</h3>
-                <p style="color: #cbd5e1; margin-bottom: 10px;">${stock.name}</p>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0;">
-                    <div style="background: rgba(34, 197, 94, 0.1); padding: 10px; border-radius: 5px;">
-                        <div style="font-size: 0.8em; color: #a0aec0;">Current Price</div>
-                        <div style="color: #22c55e; font-weight: 600;">₹${stock.current.toFixed(2)}</div>
+            <section class="long-term-card" role="region" aria-labelledby="${headingId}" tabindex="0">
+                <h3 id="${headingId}">#${rank} ${stock.symbol}</h3>
+                <p class="muted-small">${stock.name}</p>
+
+                <div class="grid-two mb-8">
+                    <div class="highlight-green">
+                        <div class="muted-small">Current Price</div>
+                        <div class="value-strong">₹${(stock.current||0).toFixed(2)}</div>
                     </div>
-                    <div style="background: rgba(34, 197, 94, 0.1); padding: 10px; border-radius: 5px;">
-                        <div style="font-size: 0.8em; color: #a0aec0;">12M Target</div>
-                        <div style="color: #22c55e; font-weight: 600;">₹${stock.target.toFixed(2)}</div>
+                    <div class="highlight-green">
+                        <div class="muted-small">12M Target</div>
+                        <div class="value-strong">₹${stock.target || 'N/A'}</div>
                     </div>
                 </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0;">
+
+                <div class="grid-two mb-8">
                     <div>
-                        <div style="font-size: 0.8em; color: #a0aec0;">Dividend Yield</div>
-                        <div style="color: #22c55e; font-weight: 600;">${stock.dividendYield}%</div>
+                        <div class="muted-small">Dividend Yield</div>
+                        <div class="value-strong">${stock.dividendYield || 'N/A'}%</div>
                     </div>
                     <div>
-                        <div style="font-size: 0.8em; color: #a0aec0;">Expected Return</div>
-                        <div style="color: #22c55e; font-weight: 600;">+${stock.targetReturn}%</div>
+                        <div class="muted-small">Expected Return</div>
+                        <div class="value-strong">+${stock.targetReturn || 'N/A'}%</div>
                     </div>
                 </div>
-                
-                <div style="color: #a0aec0; font-size: 0.9em; margin-top: 10px;">
-                    <strong>SIP Recommended:</strong> ${stock.sipRecommended}
-                </div>
-                <div style="color: #a0aec0; font-size: 0.9em;">
-                    <strong>Holding Period:</strong> ${stock.holdingPeriod}
-                </div>
-            </div>
+
+                <div class="muted-small mb-8"><strong>SIP Recommended:</strong> ${stock.sipRecommended || 'No'}</div>
+                <div class="muted-small"><strong>Holding Period:</strong> ${stock.holdingPeriod || '1-3 years'}</div>
+            </section>
         `;
     }
 
     // Render Tomorrow Plan Card
     renderTomorrowPlanCard(stock, rank) {
         return `
-            <div class="tomorrow-plan-card">
-                <h3>#${rank} ${stock.symbol} - ${stock.name}</h3>
-                
-                <div class="market-condition">${stock.marketCondition} MARKET</div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0;">
-                    <div style="background: rgba(6, 182, 212, 0.1); padding: 10px; border-radius: 5px;">
-                        <div style="font-size: 0.8em; color: #a0aec0;">Current</div>
-                        <div style="color: #06b6d4; font-weight: 600;">₹${stock.current.toFixed(2)}</div>
-                    </div>
-                    <div style="background: rgba(6, 182, 212, 0.1); padding: 10px; border-radius: 5px;">
-                        <div style="font-size: 0.8em; color: #a0aec0;">Target</div>
-                        <div style="color: #06b6d4; font-weight: 600;">₹${stock.target.toFixed(2)}</div>
-                    </div>
-                </div>
-                
-                <div class="entry-time">⏰ Entry Time: ${stock.entryTime}</div>
-                <div class="entry-time">⏱️ Exit Time: ${stock.exitTime}</div>
-                <div style="color: #10b981; font-weight: 600; font-size: 0.9em; margin: 8px 0;">Expected Gain: +${stock.expectedGain}%</div>
-                
-                <div style="background: rgba(6, 182, 212, 0.05); padding: 10px; border-radius: 5px; margin-top: 10px;">
-                    <div style="font-size: 0.8em; color: #a0aec0;">Confidence</div>
-                    <div style="color: #06b6d4; font-weight: 600;">${stock.confidenceLevel}%</div>
-                    <div style="color: #a0aec0; font-size: 0.85em; margin-top: 5px;">📰 ${stock.newsImpact}</div>
-                </div>
-            </div>
-        `;
-    }
+            <section class="long-term-card" role="region" aria-labelledby="lt-${(stock.symbol||'unknown').replace(/[^a-zA-Z0-9_-]/g,'')}-heading" tabindex="0">
+                <h3 id="lt-${(stock.symbol||'unknown').replace(/[^a-zA-Z0-9_-]/g,'')}-heading">#${rank} ${stock.symbol}</h3>
+                <p class="muted-small">${stock.name}</p>
 
-    // Render Risk Item
-    renderRiskItem(risk) {
-        return `
-            <div class="risk-item">
-                <div class="risk-title">⚠️ ${risk.title}</div>
-                <div class="risk-description">${risk.description}</div>
-                <div style="margin-top: 10px;">
-                    <span class="risk-badge risk-${risk.riskLevel.toLowerCase()}">${risk.riskLevel}</span>
+                <div class="grid-two mb-8">
+                    <div class="highlight-green">
+                        <div class="muted-small">Current Price</div>
+                        <div class="value-strong">₹${(stock.current||0).toFixed(2)}</div>
+                    </div>
+                    <div class="highlight-green">
+                        <div class="muted-small">12M Target</div>
+                        <div class="value-strong">₹${stock.target || 'N/A'}</div>
+                    </div>
                 </div>
-                <div style="color: #10b981; font-size: 0.9em; margin-top: 8px;">
-                    <strong>Mitigation:</strong> ${risk.mitigation}
+
+                <div class="grid-two mb-8">
+                    <div>
+                        <div class="muted-small">Dividend Yield</div>
+                        <div class="value-strong">${stock.dividendYield || 'N/A'}%</div>
+                    </div>
+                    <div>
+                        <div class="muted-small">Expected Return</div>
+                        <div class="value-strong">+${stock.targetReturn || 'N/A'}%</div>
+                    </div>
                 </div>
-            </div>
-        `;
+
+                <div class="muted-small mb-8"><strong>SIP Recommended:</strong> ${stock.sipRecommended || 'No'}</div>
+                <div class="muted-small"><strong>Holding Period:</strong> ${stock.holdingPeriod || '1-3 years'}</div>
+`;
     }
 
     // Render all pages
@@ -1699,11 +1692,11 @@ class AIStockAdvisor {
             case 'updates':
                 document.getElementById('updatesList').innerHTML = 
                     this.marketUpdates.map(u => `
-                        <div class="update-item">
-                            <div class="update-time">⏰ ${u.time}</div>
-                            <div style="color: #10b981; font-weight: 600; margin-bottom: 5px;">${u.title}</div>
-                            <div class="update-content">${u.content}</div>
-                        </div>
+                                <div class="update-item">
+                                    <div class="update-time">⏰ ${u.time}</div>
+                                    <div class="accent-strong mb-5">${u.title}</div>
+                                    <div class="update-content">${u.content}</div>
+                                </div>
                     `).join('');
                 document.getElementById('updatesLastUpdated').textContent = timestamp;
                 break;
@@ -1822,25 +1815,23 @@ class AIStockAdvisor {
         };
 
         let html = `
-            <div style="background: rgba(59, 130, 246, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 16px; border-left: 3px solid #3b82f6;">
-                <div style="font-weight: 600; color: #3b82f6; margin-bottom: 8px;">📡 Real-Time Data Sources</div>
-                <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px; font-size: 0.9em;">
+            <div class="info-box" role="status">
+                <div class="widget-heading">📡 Real-Time Data Sources</div>
+                <div class="widget-grid">
         `;
 
         Object.entries(sources).forEach(([source, count]) => {
             const icon = sourceIcons[source] || '📍';
             html += `
                 <div>${icon} ${source}:</div>
-                <div style="color: #10b981; font-weight: 500;">${count} stocks</div>
+                <div class="widget-count">${count} stocks</div>
             `;
         });
 
         const lastRefresh = new Date().toLocaleTimeString();
         html += `
                 </div>
-                <div style="font-size: 0.8em; color: #60a5fa; margin-top: 8px;">
-                    ⏱️ Last refreshed: ${lastRefresh}
-                </div>
+                <div class="info-small">⏱️ Last refreshed: ${lastRefresh}</div>
             </div>
         `;
 
